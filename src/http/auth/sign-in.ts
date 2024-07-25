@@ -7,7 +7,7 @@ import { InvalidCredentialsError } from '../errors/invalid-credentials-error'
 
 export const signIn = new Elysia().use(auth).post(
   '/sign-in',
-  async ({ body, set, cookie: { auth }, jwt }) => {
+  async ({ body, cookie: { auth }, jwt }) => {
     const { email, password } = body
     console.log(email)
     const userFromEmail = await db.query.users.findFirst({
@@ -37,7 +37,7 @@ export const signIn = new Elysia().use(auth).post(
     auth.maxAge = 60 * 60 * 24 * 7 // 7 days
     auth.path = '/'
 
-    set.status = 200
+    return { token }
   },
   {
     detail: {
@@ -46,6 +46,9 @@ export const signIn = new Elysia().use(auth).post(
     body: t.Object({
       email: t.String({ format: 'email' }),
       password: t.String({ minLength: 6 }),
+    }),
+    response: t.Object({
+      token: t.String(),
     }),
   },
 )
